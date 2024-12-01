@@ -5,7 +5,7 @@ description: |
 
   The helper agent (separate) is accessed via HTTP, using the Buildkite Agent
   OIDC token as its authorization.
-author: https://github.com/jamestelfer
+author: https://github.com/chinmina
 requirements: []
 configuration:
   properties:
@@ -14,5 +14,8 @@ configuration:
       description: The URL of the helper agent that vends a token for a pipeline.
     audience:
       type: string
-      description: (Default `github-app-auth:default`.) The audience to use for the Buildkite OIDC JWT that is sent to the vendor agent. Must match the setting in the vendor agent.
+      description: |
+        (Default `chinmina:default`.) The audience to use for the Buildkite OIDC
+        JWT that is sent to the vendor agent. Must match the setting in the
+        vendor agent.
   additionalProperties: false

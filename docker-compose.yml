@@ -1,7 +1,7 @@
 services:
   lint:
     image: buildkite/plugin-linter
-    command: ['--id', 'jamestelfer/github-app-auth']
+    command: ['--id', 'chinmina/chinmina-git-credentials']
     volumes:
       - ".:/plugin:ro"
 
