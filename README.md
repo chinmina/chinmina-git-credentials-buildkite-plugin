@@ -29,13 +29,13 @@ steps:
   - command: ls
     plugins:
       - chinmina/chinmina-git-credentials#v1.1.0:
-          vendor-url: "https://chinmina-bridge-url"
+          chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
 ```
 
 ## Configuration
 
-### `vendor-url` (Required, string)
+### `chinmina-url` (Required, string)
 
 The URL of the [`chinmina-bridge`][chinmina-bridge] helper agent that vends a
 token for a pipeline. This is a separate HTTP service that must accessible to

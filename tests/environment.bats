@@ -26,7 +26,7 @@ setup() {
 }
 
 teardown() {
-  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_VENDOR_URL
+  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE
 
   clear_git_config
@@ -40,11 +40,11 @@ run_environment() {
   run "$PWD/hooks/environment"
 
   assert_failure
-  assert_line --partial "Missing required parameter vendor-url"
+  assert_line --partial "Missing required parameter chinmina-url"
 }
 
 @test "Adds config for default audience" {
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_VENDOR_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
 
   run_environment "${PWD}/hooks/environment"
 
@@ -57,7 +57,7 @@ run_environment() {
 }
 
 @test "Adds config for non-default audience" {
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_VENDOR_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
 
   run_environment "${PWD}/hooks/environment"
@@ -85,7 +85,7 @@ run_environment() {
 }
 
 @test "Adds to existing configuration if present" {
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_VENDOR_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
 
   # Setup existing config items. These must exist or Git will fail.
   export GIT_CONFIG_COUNT="3"

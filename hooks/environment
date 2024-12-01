@@ -16,11 +16,15 @@ get_parameter() {
   echo "${value}"
 }
 
-vendor_url="$(get_parameter "VENDOR_URL")"
+chinmina_url="$(get_parameter "CHINMINA_URL")"
+vendor_url_compat="$(get_parameter "VENDOR_URL")"
 audience="$(get_parameter "AUDIENCE")"
 
-if [ -z "$vendor_url" ]; then
-  echo "~~~ :error: Missing required parameter vendor-url"
+# allow the old name of the parameter to be used
+chinmina_url="${chinmina_url:-$vendor_url_compat}"
+
+if [ -z "$chinmina_url" ]; then
+  echo "~~~ :error: Missing required parameter chinmina-url"
   exit 1
 fi
 
@@ -52,4 +56,4 @@ git_config_add() {
 }
 
 git_config_add "credential.https://github.com.usehttppath" "true"
-git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${vendor_url} ${audience}"
+git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience}"

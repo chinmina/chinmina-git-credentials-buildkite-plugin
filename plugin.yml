@@ -9,9 +9,9 @@ author: https://github.com/chinmina
 requirements: []
 configuration:
   properties:
-    vendor-url:
+    chinmina-url:
       type: string
-      description: The URL of the helper agent that vends a token for a pipeline.
+      description: The URL of the Chinmina Bridge agent that creates a token for a pipeline.
     audience:
       type: string
       description: |
