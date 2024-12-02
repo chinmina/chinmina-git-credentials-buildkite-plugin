@@ -1,10 +1,38 @@
 #!/bin/bash
 set -euo pipefail
 
-vendor_url="${BUILDKITE_PLUGIN_GITHUB_APP_AUTH_VENDOR_URL:?vendor-url property required}"
-audience="${BUILDKITE_PLUGIN_GITHUB_APP_AUTH_AUDIENCE:-github-app-auth:default}"
+original_prefix="BUILDKITE_PLUGIN_GITHUB_APP_AUTH_"
+prefix="BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_"
 
-echo "~~~ :git: :github: Configuring git to authenticate via the vendor agent"
+get_parameter() {
+  local key="$1"
+  local name="${prefix}${key}"
+  local value="${!name:-}"
+
+  if [ -z "$value" ]; then
+    name="${original_prefix}${key}"
+    value="${!name:-}"
+  fi
+  echo "${value}"
+}
+
+chinmina_url="$(get_parameter "CHINMINA_URL")"
+vendor_url_compat="$(get_parameter "VENDOR_URL")"
+audience="$(get_parameter "AUDIENCE")"
+
+# allow the old name of the parameter to be used
+chinmina_url="${chinmina_url:-$vendor_url_compat}"
+
+if [ -z "$chinmina_url" ]; then
+  echo "~~~ :error: Missing required parameter chinmina-url"
+  exit 1
+fi
+
+if [ -z "$audience" ]; then
+  audience="chinmina:default"
+fi
+
+echo "~~~ :git: :github: Configuring Git to authenticate via Chinmina"
 
 plugin_root="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)"
 
@@ -28,4 +56,4 @@ git_config_add() {
 }
 
 git_config_add "credential.https://github.com.usehttppath" "true"
-git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${vendor_url} ${audience}"
+git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience}"
