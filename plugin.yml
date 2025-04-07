@@ -18,4 +18,10 @@ configuration:
         (Default `chinmina:default`.) The audience to use for the Buildkite OIDC
         JWT that is sent to the vendor agent. Must match the setting in the
         vendor agent.
+    profile:
+      type: string
+      description: |
+        The name of the profile to use for the Git credential helper. If unset,
+        the default profile and endpoint will be used to obtain tokens for the
+        current pipeline.
   additionalProperties: false

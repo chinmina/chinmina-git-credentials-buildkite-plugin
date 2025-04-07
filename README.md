@@ -31,6 +31,7 @@ steps:
       - chinmina/chinmina-git-credentials#v1.1.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
+          profile: "buildkite-plugins"
 ```
 
 ## Configuration
@@ -54,6 +55,13 @@ to the purpose of the token, and also scoped to the GitHub organization that
 tokens will be vended for. `chinmina-bridge`'s GitHub app is configured for a
 particular GitHub organization/user, so if you have multiple organizations,
 multiple agents will need to be running.
+
+### `profile` (string)
+
+The name of the profile to use when requesting a token from
+[`chinmina-bridge`][chinmina-bridge]. Organization profiles are stored outside
+of `chinmina-bridge` itself, and must be set up in your deployment explicitly.
+For more information, see the [Chinmina documentation][organization-profiles].
 
 ## Developing
 
@@ -79,3 +87,4 @@ Contributions are welcome! Raise a PR, and include tests with your changes.
 
 [chinmina-bridge]: https://chinmina.github.io/introduction/
 [chinmina-integration]: https://chinmina.github.io/guides/buildkite-integration/
+[organization-profiles]: https://chinmina.github.io/reference/organization-profile/

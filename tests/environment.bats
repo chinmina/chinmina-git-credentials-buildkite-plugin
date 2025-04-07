@@ -70,6 +70,21 @@ run_environment() {
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience"
 }
 
+@test "Adds config for non-default profile" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILE=test-profile
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_0=true"
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience test-profile"
+}
+
 @test "Backwards compatible with old name" {
   export BUILDKITE_PLUGIN_GITHUB_APP_AUTH_VENDOR_URL=http://test-location
   export BUILDKITE_PLUGIN_GITHUB_APP_AUTH_AUDIENCE=test-audience
