@@ -20,9 +20,9 @@ get_parameter() {
 chinmina_url="$(get_parameter "CHINMINA_URL")"
 vendor_url_compat="$(get_parameter "VENDOR_URL")"
 audience="$(get_parameter "AUDIENCE")"
-profile="$(get_parameter "PROFILE")"
+profiles="$(get_parameter "PROFILES")"
 
-echo "Profile: $profile"
+echo "Profile: $profiles"
 
 # allow the old name of the parameter to be used
 chinmina_url="${chinmina_url:-$vendor_url_compat}"
@@ -34,6 +34,10 @@ fi
 
 if [ -z "$audience" ]; then
   audience="chinmina:default"
+fi
+
+if [ -z "$profiles" ]; then
+  profiles="default"
 fi
 
 echo "~~~ :git: :github: Configuring Git to authenticate via Chinmina"
@@ -62,5 +66,8 @@ git_config_add() {
 
 
 git_config_add "credential.https://github.com.usehttppath" "true"
-git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience} ${profile}"
+
+for profile in ${profiles}; do
+  git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience} ${profile}"
+done
 
