@@ -37,7 +37,7 @@ if [ -z "$audience" ]; then
 fi
 
 if [ -z "$profiles" ]; then
-  profiles="default"
+  profiles="repo:default"
 fi
 
 echo "~~~ :git: :github: Configuring Git to authenticate via Chinmina"
@@ -68,6 +68,10 @@ git_config_add() {
 git_config_add "credential.https://github.com.usehttppath" "true"
 
 for profile in ${profiles}; do
+  if [[ "$profile" != org:* && "$profile" != repo:* ]]; then
+    echo "~~~ :error: Invalid profile: $profile. Must start with 'org:' or 'repo:'"
+    exit 1
+  fi
   git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience} ${profile}"
 done
 

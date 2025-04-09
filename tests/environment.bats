@@ -28,6 +28,7 @@ setup() {
 teardown() {
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE
+  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES
 
   clear_git_config
 }
@@ -42,6 +43,17 @@ run_environment() {
   assert_failure
   assert_line --partial "Missing required parameter chinmina-url"
 }
+
+@test "Fails with invalid profiles" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES="invalid-test-profile"
+
+  run "$PWD/hooks/environment"
+
+  assert_failure
+  assert_line --partial "Invalid profile"
+}
+
 
 @test "Adds config for default audience" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
@@ -70,19 +82,21 @@ run_environment() {
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience"
 }
 
-@test "Adds config for non-default profile" {
+@test "Adds config for non-default profiles" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILE=test-profile
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES="org:test-profile repo:another-test-profile"
 
   run_environment "${PWD}/hooks/environment"
 
   assert_success
-  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_COUNT=3"
   assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
   assert_line "GIT_CONFIG_VALUE_0=true"
   assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
-  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience test-profile"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience org:test-profile"
+  assert_line "GIT_CONFIG_KEY_2=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_2=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience repo:another-test-profile"
 }
 
 @test "Backwards compatible with old name" {

@@ -19,7 +19,7 @@ configuration:
         JWT that is sent to the vendor agent. Must match the setting in the
         vendor agent.
     profiles:
-      type: array
+      type: string
       description: |
         The name of the profiles to use for the Git credential helper, space-separated. If unset,
         the default profile and endpoint will be used to obtain tokens for the
