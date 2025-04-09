@@ -28,7 +28,8 @@ setup() {
 teardown() {
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE
-  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES
+  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0
+  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_1
 
   clear_git_config
 }
@@ -46,7 +47,7 @@ run_environment() {
 
 @test "Fails with invalid profiles" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES="invalid-test-profile"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0="invalid-test-profile"
 
   run "$PWD/hooks/environment"
 
@@ -82,10 +83,25 @@ run_environment() {
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience"
 }
 
+@test "Adds config for default profile" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_0=true"
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience repo:default"
+}
+
 @test "Adds config for non-default profiles" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES="org:test-profile repo:another-test-profile"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0="org:test-profile"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_1="repo:another-test-profile"
 
   run_environment "${PWD}/hooks/environment"
 
