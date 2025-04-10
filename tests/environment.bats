@@ -45,17 +45,6 @@ run_environment() {
   assert_line --partial "Missing required parameter chinmina-url"
 }
 
-@test "Fails with invalid profiles" {
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0="invalid-test-profile"
-
-  run "$PWD/hooks/environment"
-
-  assert_failure
-  assert_line --partial "Invalid profile"
-}
-
-
 @test "Adds config for default audience" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
 

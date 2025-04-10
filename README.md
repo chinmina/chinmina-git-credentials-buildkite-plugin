@@ -67,10 +67,6 @@ An array of profile names to use when requesting a token from
 of `chinmina-bridge`, and must be set up in your deployment explicitly.
 For more information, see the [Chinmina documentation][organization-profiles].
 
-Profiles must start with either `repo:` or `org:`, as this will determine whether
-the profile applies at the organization level (globally) or at the repo level.
-This affects caching behaviour in Chinmina.
-
 ## Developing
 
 Run tests and plugin linting locally using `docker compose`:
