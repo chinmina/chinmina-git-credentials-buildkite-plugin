@@ -45,7 +45,7 @@ run_environment() {
   assert_line --partial "Missing required parameter chinmina-url"
 }
 
-@test "Adds config for default audience" {
+@test "Adds config for default audience and profile" {
   export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
 
   run_environment "${PWD}/hooks/environment"
@@ -55,7 +55,7 @@ run_environment() {
   assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
   assert_line "GIT_CONFIG_VALUE_0=true"
   assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
-  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default repo:default"
 }
 
 @test "Adds config for non-default audience" {
@@ -70,20 +70,6 @@ run_environment() {
   assert_line "GIT_CONFIG_VALUE_0=true"
   assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience"
-}
-
-@test "Adds config for default profile" {
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
-  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
-
-  run_environment "${PWD}/hooks/environment"
-
-  assert_success
-  assert_line "GIT_CONFIG_COUNT=2"
-  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
-  assert_line "GIT_CONFIG_VALUE_0=true"
-  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
-  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience repo:default"
 }
 
 @test "Adds config for non-default profiles" {
