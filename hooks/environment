@@ -92,12 +92,10 @@ git_config_add "credential.https://github.com.usehttppath" "true"
 
 # iterate over all provided profiles and configure a credential helper for each one
 for profile in "${profiles[@]}"; do
-  # support both the old and new default profile name
-  # TODO: uncomment the below code once chinmina profile support is rolled out
-  # if [[ "${profile}" != org:* && "${profile}" != repo:* ]]; then
-  #   echo "~~~ :error: Invalid profile: ${profile}. Must start with 'org:' or 'repo:'"
-  #   exit 1
-  # fi
+  if [[ "${profile}" != org:* && "${profile}" != repo:* ]]; then
+    echo "~~~ :warning: Invalid profile: ${profile}. Must start with 'org:' or 'repo:'. Skipping configuration for this profile."
+    continue
+  fi
   git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience} ${profile}"
 done
 
