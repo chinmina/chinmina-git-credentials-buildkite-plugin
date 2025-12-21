@@ -28,7 +28,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: ls
     plugins:
-      - chinmina/chinmina-git-credentials#v1.1.0:
+      - chinmina/chinmina-git-credentials#v1.2.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
           profiles: 
@@ -66,6 +66,16 @@ An array of profile names to use when requesting a token from
 [`chinmina-bridge`][chinmina-bridge]. Organization profiles are stored outside
 of `chinmina-bridge`, and must be set up in your deployment explicitly.
 For more information, see the [Chinmina documentation][organization-profiles].
+
+## Token Caching
+
+The credential helper caches OIDC tokens for 5 minutes to reduce latency and load on successive Git operations within the same build job. This improves performance when multiple repository operations occur in a single step.
+
+**Encryption requirement:** Caching is only enabled when `openssl` is available on the agent. If `openssl` is not found, the credential helper skips caching and requests a fresh OIDC token for each Git operation.
+
+**Cache security:** When enabled, the cache file is encrypted using AES-256-CBC with PBKDF2 (100,000 iterations), using the `BUILDKITE_AGENT_ACCESS_TOKEN` as the encryption key. The cache file is written to `${TMPDIR}/chinmina-oidc-${BUILDKITE_JOB_ID}.cache` with 600 permissions, restricting access to the build agent process.
+
+**Cache scope:** Each build job maintains its own cache file, identified by `BUILDKITE_JOB_ID`. The cache expires after 5 minutes or when the temporary directory is cleaned up.
 
 ## Developing
 
