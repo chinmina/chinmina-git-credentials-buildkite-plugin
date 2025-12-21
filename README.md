@@ -73,10 +73,10 @@ Run tests and plugin linting locally using `docker compose`:
 
 ```shell
 # Buildkite plugin linter
-docker-compose run --rm lint
+docker compose run --rm lint
 
 # Bash tests
-docker-compose run --rm tests
+docker compose run --rm tests
 ```
 
 ## Contributing
