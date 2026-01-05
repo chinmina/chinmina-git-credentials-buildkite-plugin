@@ -83,7 +83,7 @@ run_environment() {
   assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
   assert_line "GIT_CONFIG_VALUE_0=true"
   assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
-  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience repo:default"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience pipeline:default"
 }
 
 @test "Adds config for non-default profiles" {
@@ -102,6 +102,21 @@ run_environment() {
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience org:test-profile"
   assert_line "GIT_CONFIG_KEY_2=credential.https://github.com.helper"
   assert_line --regexp "GIT_CONFIG_VALUE_2=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience repo:another-test-profile"
+}
+
+@test "Adds config for pipeline profile prefix" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE=test-audience
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0="pipeline:custom"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_0=true"
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location test-audience pipeline:custom"
 }
 
 @test "Backwards compatible with old name" {
