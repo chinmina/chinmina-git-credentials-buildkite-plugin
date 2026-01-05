@@ -182,3 +182,14 @@ run_environment() {
   assert_failure
   assert_output --partial "Error: invalid profile name 'bad/name'"
 }
+
+@test "Credential helper fails with unrecognized prefix" {
+  export TMPDIR=/tmp
+  export BUILDKITE_JOB_ID=test-job-id
+
+  run "${PWD}/credential-helper/buildkite-connector-credential-helper" \
+    "http://test-location" "test-audience" "unknown:profile" "get"
+
+  assert_failure
+  assert_output --partial "Error: unrecognized profile prefix 'unknown'"
+}
