@@ -50,7 +50,8 @@ Git operation (clone/fetch) → credential helper → buildkite-agent OIDC → c
 The plugin supports legacy configuration prefixes and parameter names:
 - Old plugin prefix: `BUILDKITE_PLUGIN_GITHUB_APP_AUTH_*`
 - Old parameter: `vendor-url` (now `chinmina-url`)
-- Old profile: `default` (now `repo:default`)
+- Old profile: `default` (now `pipeline:default`)
+- Deprecated profile prefix: `repo:` (now `pipeline:`)
 
 ## Testing
 

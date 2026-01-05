@@ -31,8 +31,8 @@ steps:
       - chinmina/chinmina-git-credentials#v1.3.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
-          profiles: 
-            - repo:default
+          profiles:
+            - pipeline:default
             - org:buildkite-plugins
 ```
 
@@ -60,7 +60,7 @@ multiple agents will need to be running.
 
 ### `profiles` (array)
 
-**Default:** [`repo:default`]
+**Default:** [`pipeline:default`]
 
 An array of profile names to use when requesting a token from
 [`chinmina-bridge`][chinmina-bridge]. Organization profiles are stored outside

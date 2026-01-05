@@ -62,7 +62,7 @@ if plugin_read_list_into_result "${prefix}PROFILES"; then
 fi
 
 if [[ ${#profiles[@]} -eq 0 ]]; then
-  profiles=("repo:default")
+  profiles=("pipeline:default")
 fi
 
 echo "~~~ :git: :github: Configuring Git to authenticate via Chinmina"
@@ -94,8 +94,8 @@ git_config_add "credential.https://github.com.usehttppath" "true"
 for profile in "${profiles[@]}"; do
   # support both the old and new default profile name
   # TODO: uncomment the below code once chinmina profile support is rolled out
-  # if [[ "${profile}" != org:* && "${profile}" != repo:* ]]; then
-  #   echo "~~~ :error: Invalid profile: ${profile}. Must start with 'org:' or 'repo:'"
+  # if [[ "${profile}" != org:* && "${profile}" != pipeline:* && "${profile}" != repo:* ]]; then
+  #   echo "~~~ :error: Invalid profile: ${profile}. Must start with 'org:', 'pipeline:', or 'repo:'"
   #   exit 1
   # fi
   git_config_add "credential.https://github.com.helper" "${plugin_root}/credential-helper/buildkite-connector-credential-helper ${chinmina_url} ${audience} ${profile}"
