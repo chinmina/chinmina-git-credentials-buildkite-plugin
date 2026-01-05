@@ -156,3 +156,40 @@ run_environment() {
   assert_line "GIT_CONFIG_KEY_4=credential.https://github.com.helper"
   assert_line --regexp "GIT_CONFIG_VALUE_4=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default"
 }
+
+#
+# Tests for credential helper validation
+#
+
+@test "Credential helper fails with profile without colon separator" {
+  export TMPDIR=/tmp
+  export BUILDKITE_JOB_ID=test-job-id
+
+  run "${PWD}/credential-helper/buildkite-connector-credential-helper" \
+    "http://test-location" "test-audience" "invalid-profile" "get"
+
+  assert_failure
+  assert_output --partial "Error: invalid profile format 'invalid-profile'"
+}
+
+@test "Credential helper fails with invalid characters in profile name" {
+  export TMPDIR=/tmp
+  export BUILDKITE_JOB_ID=test-job-id
+
+  run "${PWD}/credential-helper/buildkite-connector-credential-helper" \
+    "http://test-location" "test-audience" "pipeline:bad/name" "get"
+
+  assert_failure
+  assert_output --partial "Error: invalid profile name 'bad/name'"
+}
+
+@test "Credential helper fails with unrecognized prefix" {
+  export TMPDIR=/tmp
+  export BUILDKITE_JOB_ID=test-job-id
+
+  run "${PWD}/credential-helper/buildkite-connector-credential-helper" \
+    "http://test-location" "test-audience" "unknown:profile" "get"
+
+  assert_failure
+  assert_output --partial "Error: unrecognized profile prefix 'unknown'"
+}
