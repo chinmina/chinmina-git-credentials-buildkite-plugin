@@ -67,6 +67,19 @@ An array of profile names to use when requesting a token from
 of `chinmina-bridge`, and must be set up in your deployment explicitly.
 For more information, see the [Chinmina documentation][organization-profiles].
 
+### `exclusive` (boolean)
+
+**Default:** `false`
+
+When set to `true`, clears any existing Git credential helpers for GitHub before adding the plugin's credential helper. This ensures that only the Chinmina credential helper is used for GitHub authentication, ignoring any system-wide or global Git credential configurations.
+
+This is useful in shared CI infrastructure where:
+- Build agents may have system-level credential helper configurations
+- Strict credential isolation is required between pipelines
+- You need deterministic credential sourcing exclusively through Chinmina
+
+When `false` (default), the plugin's credential helper is added to the existing credential helper chain, allowing fallback to other configured helpers if needed.
+
 ## Token Caching
 
 The credential helper caches OIDC tokens for 5 minutes to reduce latency and load on successive Git operations within the same build job. This improves performance when multiple repository operations occur in a single step.
