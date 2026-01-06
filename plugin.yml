@@ -28,6 +28,8 @@ configuration:
       type: boolean
       description: |
         When true, clears existing credential helpers before adding the plugin's
-        helpers. This ensures only the Chinmina credential helper is used for
-        GitHub authentication.
+        helpers. This allows you to replace previously configured credential
+        helpers (including default Chinmina profiles) with the profiles specified
+        in this plugin configuration. Ensure at least one profile has contents:read
+        permission, otherwise checkout will fail.
   additionalProperties: false

@@ -71,14 +71,23 @@ For more information, see the [Chinmina documentation][organization-profiles].
 
 **Default:** `false`
 
-When set to `true`, clears any existing Git credential helpers for GitHub before adding the plugin's credential helper. This ensures that only the Chinmina credential helper is used for GitHub authentication, ignoring any system-wide or global Git credential configurations.
+When set to `true`, clears any existing Git credential helpers for GitHub before adding the plugin's credential helper. This allows you to replace previously configured credential helpers (including default Chinmina profiles) with the profiles specified in this plugin configuration.
 
-This is useful in shared CI infrastructure where:
-- Build agents may have system-level credential helper configurations
-- Strict credential isolation is required between pipelines
-- You need deterministic credential sourcing exclusively through Chinmina
+In most Chinmina Bridge installations, the credential helper is pre-configured to use pipeline credentials with the default profile. These configurations precede any set by the plugin. Setting `exclusive: true` clears all previous profiles, allowing you to use different profiles for Git operations instead of the default.
 
-When `false` (default), the plugin's credential helper is added to the existing credential helper chain, allowing fallback to other configured helpers if needed.
+> [!IMPORTANT]
+> When using `exclusive: true`, ensure that at least one profile in your configuration has `contents:read` permission for the repository, otherwise the checkout will fail.
+
+**Example use case:** You want to use an organization-scoped profile instead of the default pipeline profile:
+
+```yml
+plugins:
+  - chinmina/chinmina-git-credentials#v1.5.0:
+      chinmina-url: "https://chinmina-bridge-url"
+      exclusive: true
+      profiles:
+        - org:my-org-profile
+```
 
 ## Token Caching
 
