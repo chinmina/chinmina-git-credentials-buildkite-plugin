@@ -30,6 +30,7 @@ teardown() {
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_1
+  unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_EXCLUSIVE
 
   clear_git_config
 }
@@ -155,6 +156,49 @@ run_environment() {
   assert_line "GIT_CONFIG_VALUE_3=true"
   assert_line "GIT_CONFIG_KEY_4=credential.https://github.com.helper"
   assert_line --regexp "GIT_CONFIG_VALUE_4=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default"
+}
+
+@test "Adds empty helper first when exclusive is true" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_EXCLUSIVE=true
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=3"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.helper"
+  assert_line "GIT_CONFIG_VALUE_0="
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_1=true"
+  assert_line "GIT_CONFIG_KEY_2=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_2=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default pipeline:default"
+}
+
+@test "Does not add empty helper when exclusive is false" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_EXCLUSIVE=false
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_0=true"
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default pipeline:default"
+}
+
+@test "Does not add empty helper when exclusive is unset" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL=http://test-location
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line "GIT_CONFIG_COUNT=2"
+  assert_line "GIT_CONFIG_KEY_0=credential.https://github.com.usehttppath"
+  assert_line "GIT_CONFIG_VALUE_0=true"
+  assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default pipeline:default"
 }
 
 #

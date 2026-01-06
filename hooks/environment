@@ -65,6 +65,8 @@ if [[ ${#profiles[@]} -eq 0 ]]; then
   profiles=("pipeline:default")
 fi
 
+exclusive="$(get_parameter "EXCLUSIVE")"
+
 echo "~~~ :git: :github: Configuring Git to authenticate via Chinmina"
 
 plugin_root="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)"
@@ -87,6 +89,10 @@ git_config_add() {
     export "GIT_CONFIG_KEY_${index}=${key}"
     export "GIT_CONFIG_VALUE_${index}=${value}"
 }
+
+if [[ "${exclusive}" == "true" ]]; then
+  git_config_add "credential.https://github.com.helper" ""
+fi
 
 git_config_add "credential.https://github.com.usehttppath" "true"
 

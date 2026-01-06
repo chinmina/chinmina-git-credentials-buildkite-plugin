@@ -28,7 +28,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: ls
     plugins:
-      - chinmina/chinmina-git-credentials#v1.4.1:
+      - chinmina/chinmina-git-credentials#v1.5.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
           profiles:
@@ -66,6 +66,28 @@ An array of profile names to use when requesting a token from
 [`chinmina-bridge`][chinmina-bridge]. Organization profiles are stored outside
 of `chinmina-bridge`, and must be set up in your deployment explicitly.
 For more information, see the [Chinmina documentation][organization-profiles].
+
+### `exclusive` (boolean)
+
+**Default:** `false`
+
+When set to `true`, clears any existing Git credential helpers for GitHub before adding the plugin's credential helper. This allows you to replace previously configured credential helpers (including default Chinmina profiles) with the profiles specified in this plugin configuration.
+
+In most Chinmina Bridge installations, the credential helper is pre-configured to use pipeline credentials with the default profile. These configurations precede any set by the plugin. Setting `exclusive: true` clears all previous profiles, allowing you to use different profiles for Git operations instead of the default.
+
+> [!IMPORTANT]
+> When using `exclusive: true`, ensure that at least one profile in your configuration has `contents:read` permission for the repository, otherwise the checkout will fail.
+
+**Example use case:** You want to use an organization-scoped profile instead of the default pipeline profile:
+
+```yml
+plugins:
+  - chinmina/chinmina-git-credentials#v1.5.0:
+      chinmina-url: "https://chinmina-bridge-url"
+      exclusive: true
+      profiles:
+        - org:my-org-profile
+```
 
 ## Token Caching
 

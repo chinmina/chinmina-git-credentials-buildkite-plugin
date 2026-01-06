@@ -24,4 +24,12 @@ configuration:
         An array of profiles to use for the Git credential helper. If unset,
         the default profile and endpoint will be used to obtain tokens for the
         current pipeline.
+    exclusive:
+      type: boolean
+      description: |
+        When true, clears existing credential helpers before adding the plugin's
+        helpers. This allows you to replace previously configured credential
+        helpers (including default Chinmina profiles) with the profiles specified
+        in this plugin configuration. Ensure at least one profile has contents:read
+        permission, otherwise checkout will fail.
   additionalProperties: false
