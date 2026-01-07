@@ -46,14 +46,16 @@ audience="$(get_parameter "AUDIENCE")"
 # allow the old name of the parameter to be used
 chinmina_url="${chinmina_url:-$vendor_url_compat}"
 
+# fallback to environment variable if not set
+chinmina_url="${chinmina_url:-${CHINMINA_DEFAULT_URL:-}}"
+
 if [ -z "$chinmina_url" ]; then
   echo "~~~ :error: Missing required parameter chinmina-url"
   exit 1
 fi
 
-if [ -z "$audience" ]; then
-  audience="chinmina:default"
-fi
+# fallback to environment variable, then hardcoded default
+audience="${audience:-${CHINMINA_DEFAULT_AUDIENCE:-chinmina:default}}"
 
 profiles=()
 # read profiles from the plugin config, returns an array
