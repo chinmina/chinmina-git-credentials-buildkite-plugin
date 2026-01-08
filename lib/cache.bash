@@ -6,16 +6,18 @@ CACHE_TTL_MINUTES=5
 
 # Returns the full cache file path for a given Buildkite job ID
 cache_get_file_path() {
-  local job_id="${1:?job_id parameter required}"
-  echo "${TMPDIR}/chinmina-oidc-${job_id}.cache"
+  local cache_temp_dir="${1:?cache_temp_dir parameter required}"
+  local job_id="${2:?job_id parameter required}"
+  echo "${cache_temp_dir}/chinmina-oidc-${job_id}.cache"
 }
 
 # Reads cached content if valid (exists, non-empty, within TTL), returning
 # non-zero on failure. Content is decrypted and written to stdout.
 cache_read() {
-  local job_id="${1:?job_id parameter required}"
+  local cache_temp_dir="${1:?cache_temp_dir parameter required}"
+  local job_id="${2:?job_id parameter required}"
   local cache_file encryption_method
-  cache_file="$(cache_get_file_path "${job_id}")"
+  cache_file="$(cache_get_file_path "${cache_temp_dir}" "${job_id}")"
   encryption_method="$(_get_encryption_method)"
 
   # No encryption available - can't read encrypted cache
@@ -37,16 +39,20 @@ cache_read() {
 # token to cache. If no encryption is available, skips caching silently.
 # Always returns 0 to avoid breaking callers that use set -e.
 cache_write() {
-  local job_id="${1:?job_id parameter required}"
-  local content="${2:?content parameter required}"
+  local cache_temp_dir="${1:?cache_temp_dir parameter required}"
+  local job_id="${2:?job_id parameter required}"
+  local content="${3:?content parameter required}"
   local cache_file encryption_method
-  cache_file="$(cache_get_file_path "${job_id}")"
+  cache_file="$(cache_get_file_path "${cache_temp_dir}" "${job_id}")"
   encryption_method="$(_get_encryption_method)"
 
   # No encryption available - skip caching silently
   if [[ -z "${encryption_method}" ]]; then
     return 0
   fi
+
+  # Ensure cache directory exists
+  mkdir -p "${cache_temp_dir}"
 
   # Attempt encryption, ignore failures
   if echo "${content}" | "_encrypt_with_${encryption_method}" "${cache_file}"; then
