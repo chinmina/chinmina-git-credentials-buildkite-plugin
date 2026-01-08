@@ -36,6 +36,13 @@ steps:
             - org:buildkite-plugins
 ```
 
+> [!TIP]
+> `chinmina-url` and `audience` can have [default values](#environment-variables)
+> set in the environment either for the pipeline or in the agent hooks for
+> installation-wide defaults. Setting defaults for the whole
+> installation/organization is the best way to go in order to keep the
+> solution maintainable.
+
 ## Configuration
 
 ### `chinmina-url` (Required, string)
