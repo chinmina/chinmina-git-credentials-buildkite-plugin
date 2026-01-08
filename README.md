@@ -28,7 +28,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: ls
     plugins:
-      - chinmina/chinmina-git-credentials#v1.5.0:
+      - chinmina/chinmina-git-credentials#v1.6.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
           profiles:
@@ -82,11 +82,61 @@ In most Chinmina Bridge installations, the credential helper is pre-configured t
 
 ```yml
 plugins:
-  - chinmina/chinmina-git-credentials#v1.5.0:
+  - chinmina/chinmina-git-credentials#v1.6.0:
       chinmina-url: "https://chinmina-bridge-url"
       exclusive: true
       profiles:
         - org:my-org-profile
+```
+
+## Environment Variables
+
+For organization-wide consistency, you can set default values using environment variables that apply when plugin parameters are not specified:
+
+- `CHINMINA_DEFAULT_URL`: Default Chinmina Bridge URL
+- `CHINMINA_DEFAULT_AUDIENCE`: Default OIDC audience
+
+### Priority
+
+Configuration values are resolved in the following order:
+
+1. Plugin parameters (highest priority)
+2. Environment variables
+3. Hardcoded defaults (audience only: `chinmina:default`)
+
+### Agent Configuration Example
+
+Set these in your agent's environment hook (`/etc/buildkite-agent/hooks/environment`):
+
+```bash
+export CHINMINA_DEFAULT_URL="https://chinmina-bridge.company.internal"
+export CHINMINA_DEFAULT_AUDIENCE="chinmina:production"
+```
+
+### Simplified Pipeline Configuration
+
+With environment variables set, pipelines can omit common configuration:
+
+```yaml
+steps:
+  - command: ./build.sh
+    plugins:
+      - chinmina/chinmina-git-credentials#v1.6.0:
+          profiles:
+            - org:shared-dependencies
+```
+
+Or override defaults when needed:
+
+```yaml
+steps:
+  - command: ./build.sh
+    plugins:
+      - chinmina/chinmina-git-credentials#v1.6.0:
+          chinmina-url: https://chinmina-staging.company.internal
+          audience: chinmina:staging
+          profiles:
+            - org:staging-profile
 ```
 
 ## Token Caching

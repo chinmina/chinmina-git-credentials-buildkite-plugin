@@ -31,6 +31,8 @@ teardown() {
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_0
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_PROFILES_1
   unset BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_EXCLUSIVE
+  unset CHINMINA_DEFAULT_URL
+  unset CHINMINA_DEFAULT_AUDIENCE
 
   clear_git_config
 }
@@ -199,6 +201,102 @@ run_environment() {
   assert_line "GIT_CONFIG_VALUE_0=true"
   assert_line "GIT_CONFIG_KEY_1=credential.https://github.com.helper"
   assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default pipeline:default"
+}
+
+#
+# Tests for environment variable defaults
+#
+
+@test "Uses CHINMINA_DEFAULT_URL when plugin parameter is absent" {
+  export CHINMINA_DEFAULT_URL="http://default-location"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://default-location chinmina:default pipeline:default"
+}
+
+@test "Plugin chinmina-url overrides CHINMINA_DEFAULT_URL" {
+  export CHINMINA_DEFAULT_URL="http://default-location"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL="http://override-location"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://override-location chinmina:default pipeline:default"
+  refute_line --partial "http://default-location"
+}
+
+@test "Fails when both CHINMINA_DEFAULT_URL and plugin parameter are absent" {
+  run "${PWD}/hooks/environment"
+
+  assert_failure
+  assert_line --partial "Missing required parameter chinmina-url"
+}
+
+@test "Uses CHINMINA_DEFAULT_URL with custom audience" {
+  export CHINMINA_DEFAULT_URL="http://default-location"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE="custom-audience"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://default-location custom-audience pipeline:default"
+}
+
+@test "Uses CHINMINA_DEFAULT_AUDIENCE when plugin parameter is absent" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL="http://test-location"
+  export CHINMINA_DEFAULT_AUDIENCE="default-audience"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location default-audience pipeline:default"
+}
+
+@test "Plugin audience overrides CHINMINA_DEFAULT_AUDIENCE" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL="http://test-location"
+  export CHINMINA_DEFAULT_AUDIENCE="default-audience"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE="override-audience"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location override-audience pipeline:default"
+  refute_line --partial "default-audience"
+}
+
+@test "Falls back to chinmina:default when neither parameter nor CHINMINA_DEFAULT_AUDIENCE set" {
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL="http://test-location"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://test-location chinmina:default pipeline:default"
+}
+
+@test "Uses both CHINMINA_DEFAULT_URL and CHINMINA_DEFAULT_AUDIENCE" {
+  export CHINMINA_DEFAULT_URL="http://default-location"
+  export CHINMINA_DEFAULT_AUDIENCE="default-audience"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://default-location default-audience pipeline:default"
+}
+
+@test "Plugin parameters override both environment variables" {
+  export CHINMINA_DEFAULT_URL="http://default-location"
+  export CHINMINA_DEFAULT_AUDIENCE="default-audience"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_CHINMINA_URL="http://override-location"
+  export BUILDKITE_PLUGIN_CHINMINA_GIT_CREDENTIALS_AUDIENCE="override-audience"
+
+  run_environment "${PWD}/hooks/environment"
+
+  assert_success
+  assert_line --regexp "GIT_CONFIG_VALUE_1=/.*/credential-helper/buildkite-connector-credential-helper http://override-location override-audience pipeline:default"
+  refute_line --partial "default-location"
+  refute_line --partial "default-audience"
 }
 
 #

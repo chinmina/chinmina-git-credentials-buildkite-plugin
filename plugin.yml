@@ -11,13 +11,17 @@ configuration:
   properties:
     chinmina-url:
       type: string
-      description: The URL of the Chinmina Bridge agent that creates a token for a pipeline.
+      description: |
+        The URL of the Chinmina Bridge agent that creates a token for a pipeline.
+        If not provided, falls back to the CHINMINA_DEFAULT_URL environment variable.
+        This parameter is required and must be set via either mechanism.
     audience:
       type: string
       description: |
-        (Default `chinmina:default`.) The audience to use for the Buildkite OIDC
-        JWT that is sent to the vendor agent. Must match the setting in the
-        vendor agent.
+        The audience to use for the Buildkite OIDC JWT that is sent to the vendor
+        agent. Must match the setting in the vendor agent.
+
+        Priority: plugin parameter > CHINMINA_DEFAULT_AUDIENCE environment variable > "chinmina:default"
     profiles:
       type: array
       description: |
