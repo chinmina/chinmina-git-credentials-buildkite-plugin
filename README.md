@@ -28,7 +28,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: ls
     plugins:
-      - chinmina/chinmina-git-credentials#v1.5.0:
+      - chinmina/chinmina-git-credentials#v1.6.0:
           chinmina-url: "https://chinmina-bridge-url"
           audience: "chinmina:your-github-organization"
           profiles:
@@ -82,7 +82,7 @@ In most Chinmina Bridge installations, the credential helper is pre-configured t
 
 ```yml
 plugins:
-  - chinmina/chinmina-git-credentials#v1.5.0:
+  - chinmina/chinmina-git-credentials#v1.6.0:
       chinmina-url: "https://chinmina-bridge-url"
       exclusive: true
       profiles:
